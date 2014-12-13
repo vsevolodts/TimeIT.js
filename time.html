@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="timeit.css">
+</head>
+<body>
+<input type="text" value="2014-05-16" />
+<button>test</button>
+
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="timeit.js"></script>
+<script>
+var offset = new Date().getTimezoneOffset();
+
+$("button").click( function() {
+  var n = oTime ($("input").val());
+  $(this).after('<br><b>timestamp:</b> '+n+' | date: '+new Date(n) +', Offset: '+offset);
+  /*
+  if (n==''){
+    $(this).after('<br>now'+n);
+  } else {
+  	$(this).after('<br>timestamp: '+n+' | date: '+new Date(n));
+  };*/
+  
+});
+
+
+function fretutn () {
+  var n = new Date().getTime();
+  return n;
+}
+
+  function oTime (t) {
+    //var n = new Date().getTime();
+		t = t || new Date(); /*fretutn(n)*/
+		var oDate = new Date(t);
+		if (!Date.parse(oDate)) {var oDate = new Date();}
+		oDate.setHours(
+			parseInt(t.substr(0, 2), 10),
+			parseInt(t.substr(3, 2), 10),
+			0,
+			0
+		);
+	var callback = oDate.getTime();
+	return callback;
+ };
+ 
+ </script>
+
+
+</body>
+</html>
