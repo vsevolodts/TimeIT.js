@@ -10,25 +10,34 @@
 <h3>Basic examples</h3>
 <h4>Hide content after a date</h4>
   <li data-end="2014-5-5" class="timeit">May 5th, 2014 <small>no start, past end - hidden</small></li>
-  <li data-end="2015-07-10" class="timeit">July 10th, 2015 <small>no start, future end - shown</small></li>
+  <li data-end="2025-07-10" class="timeit">July 10th, 2025 <small>no start, future end - shown</small></li>
 <li data-start="2014-01-10" class="timeit">January 10, 2014 <small>start in the past, no end - shown</small></li>
+<li data-start="2026-12-01" class="timeit">Dec 1, 2026 <small>start  Future, no end - hidden</small></li>
 
 <h4>Show content between dates</h4>
-<li data-start="2014-06-31" data-end="2015-01-01" class="timeit">June - Dec 2014 <small>whithing a range</small></li>
+<li data-start="2014-06-31" data-end="2017-01-01" class="timeit">June 2014 - Jan 2017 <small>whithing a range</small></li>
 <li data-start="2013-06-30" data-end="2013-07-01" class="timeit">June - July 2013 <small>past range</small></li> 
 <li data-start="2018-01-01" data-end="2018-02-31" class="timeit">Jan-Feb 2018 <small>future range</small></li> 
 
 
 <h4>Show content after a date (no expiration)</h4>
-<li data-start="2014-06-31" class="timeit">June 31, 2014 <small>shown - current event</small></li>
-  <li data-start="2015-06-31" class="timeit">Jan 1st, 2015 <small>hidden - future event</small></li>
+<li data-start="2014-06-31" class="timeit">June 31, 2014</li>
+  <li data-start="2020-01-01" class="timeit">Jan 1st, 2020 </li>
   
 <h3>Complex solutions</h3>
 <h4>Repetetive daily event</h4>
-<li data-start="17:10" data-end="18:00" class="timeit" id="#time">5:10 PM - 6 PM daily</li>
-<h4>Repetetive event with a srart/end date</h4>
-<li data-start="2014-09-01 05:00" data-end="12:00" class="timeit" id="#time">Show content from 12AM to 12PM daily starting Sept 1, 2014</li>
+<li data-start="12:10" data-end="18:00" class="timeit">12:10 PM - 6 PM daily</li>
+<h4>Repetetive event with a start/end date</h4>
+<li data-start="2014-09-01 05:00" data-end="11:00" class="timeit">Show content from 5AM to 12AM daily starting Sept 1, 2014</li>
 <br><br>
+
+<h3>Processing user input errors</h3>
+<p>When the date or time is entered with an error, .error class is added with a 'title' attribute that describes an error. This functionality is removed from minified version of the plugin.</p>
+<li data-start="5 AM" data-end="5 PM" class="timeit">5 AM - 10-30 daily</li>
+<li data-start="2014\12\31" class="timeit">2014\12\31</li>
+
+
+    <br><br>
 
 <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="timeit.js"></script>
