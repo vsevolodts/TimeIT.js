@@ -1,3 +1,4 @@
+//version 3. 2017-08-13
 function timeit() {
   var next_run_array = []; //array of dates/time on a page used to rerun function if a change should happen during the session
   var curDate = new Date();
@@ -27,7 +28,7 @@ function timeit() {
         next_run_array.push(nextruntimeout);    
       }
     }
-
+    
     // Main Function 
     //check if the evend outside of a desired time span
     if (((startDate < endDate) && (startDate > curDate || endDate < curDate)) ||
@@ -39,9 +40,30 @@ function timeit() {
     }
 
 	//Support Functions
+    //correct data creation from a string. accepted format YYYY-MM-DD HH:MM
+    function parseISO8601(d) {
+    var isoExp = /^\s*(\d{4})-(\d\d)-(\d\d)?.(\d\d)?.(\d\d)\s*$/,
+        date = new Date(NaN), 
+        datenew,
+        month,
+        dateString=d.substr(0, d.indexOf(' ')); 
+        parts = isoExp.exec(d);
+
+    if(parts) {  
+      month = +parts[2];
+      date.setFullYear(parts[1], month - 1, parts[3]);
+      if(month != date.getMonth() + 1) {
+        date.setTime(NaN);
+      }
+      date = new Date(parts[1], month - 1, parts[3],  parts[4], parts[5])
+    }
+    return date;
+  }
+
+  //unification of the date string to the format YYYY-MM-DD HH:MM
     function checkdate(date, obj) {
       if (date) {
-        //check if only time is set; if so, add today's date to unify dates format
+        //check if only time is set (HH:MM); if so, add today's date 
         if (String(date).length < 6 && String(date).indexOf(":") > -1) {
           date = curDateYMD + ' ' + String(date);
         }
@@ -56,11 +78,18 @@ function timeit() {
           minutes = res.slice(1);
         var timetest = (hours < 24 && minutes < 60) ? true : false;
 
-        if (new Date(date) == 'Invalid Date' || !timetest) {
+        //check if date is could be created from a value; if fails try to parse a string to a format
+        var returndate = new Date(date);
+        if (returndate == 'Invalid Date') {
+          var returndate = parseISO8601(date);
+        };
+        
+        
+        if (returndate == 'Invalid Date' || !timetest) {
           //highlight the element if the is an error. use own \.error class if needed
           $(obj).addClass("error").attr('title', '"' + date + '" date is incorrect; please use YYYY-MM-DD HH:MM format');
         }
-        return new Date(date).getTime();
+        return returndate.getTime();
       } else {
         //if datetime is not set, just return current date-time
         return curDate.getTime();
