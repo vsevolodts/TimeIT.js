@@ -1,45 +1,429 @@
+<?php
+$tomorrow  = mktime(0, 0, 0, date("m")  , date("d")+1, date("Y"));
+$lastweek  = mktime(0, 0, 0, date("m")  , date("d")-7, date("Y"));
+$nextweek  = mktime(0, 0, 0, date("m")  , date("d")+7, date("Y"));
+$nextyear  = mktime(0, 0, 0, date("m")  , date("d"), date("Y")+1);
+?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<link rel="stylesheet" href="timeit.css">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Simple javascript plugin that help to orginize content that should be shown only during certain time on a static page.">
+    <meta name="author" content="Vsevolod Tsurikov">
+    <title>TimeIT.js - jQuery plugin to Show/Hide Content at Set Date/Time</title>    
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/freelancer.css" rel="stylesheet">
+    <link href="css/datetimepicker.css" rel="stylesheet">
+    <link href="font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	<style>
+	#examples .hidden { color:#ccc; text-decoration: line-through; display:inline !important; visibility:visible !important}
+	</style>
 </head>
-<body>
-<h2>Timeit: jQuery plugin for static pages to hide/display content based on date/time</h2>
-<note>Format of date: YYYY-MM-DD HH:MM</note>
 
-<h3>Basic examples</h3>
-<h4>Hide content after a date</h4>
-  <li data-end="2014-5-5" class="timeit">May 5th, 2014 <small>no start, past end - hidden</small></li>
-  <li data-end="2025-07-10" class="timeit">July 10th, 2025 <small>no start, future end - shown</small></li>
-<li data-start="2014-01-10" class="timeit">January 10, 2014 <small>start in the past, no end - shown</small></li>
-<li data-start="2026-12-01" class="timeit">Dec 1, 2026 <small>start  Future, no end - hidden</small></li>
+<body id="page-top" class="index">
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#page-top">TimeIT.js</a>
+            </div>
 
-<h4>Show content between dates</h4>
-<li data-start="2014-06-31" data-end="2017-01-01" class="timeit">June 2014 - Jan 2017 <small>whithing a range</small></li>
-<li data-start="2013-06-30" data-end="2013-07-01" class="timeit">June - July 2013 <small>past range</small></li> 
-<li data-start="2018-01-01" data-end="2018-02-31" class="timeit">Jan-Feb 2018 <small>future range</small></li> 
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="hidden">
+                        <a href="#page-top"></a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#docs">Use</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#implement">Implement</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#examples">Examples</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#build">Build</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="https://github.com/vsevolodts/TimeIT.js" target="_blank">Fork on Github</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
 
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="intro-text">
+                        <span class="name"> <i class="fa fa-6 fa-calendar"></i> TimeIT.js</span>
+                        <hr class="star-light">
+                        <span class="skills">jQuery plugin to Show/Hide Content at Set Date/Time</span>
+                    </div>
+                    <div class="col-lg-8 col-lg-offset-2 text-center">
+                    <a href="timeit.zip" class="btn btn-lg btn-outline"><i class="fa fa-download"></i> Download Plugin</a>
+                    <br>
+                    <a href="https://github.com/vsevolodts/TimeIT.js" target="_blank" class="btn btn-md btn-outline"><i class="fa fa-github"></i> Fork on Github</a>
+                    <a href="http://codepen.io/VsevolodTS/pen/KFEou" target="_blank" class="btn btn-md btn-outline"><i class="fa fa-codepen"></i> Fork on CodePen</a>
+                </div>
+                </div>
+            </div>
+        </div>
+    </header>
 
-<h4>Show content after a date (no expiration)</h4>
-<li data-start="2014-06-31" class="timeit">June 31, 2014</li>
-  <li data-start="2020-01-01" class="timeit">Jan 1st, 2020 </li>
-  
-<h3>Complex solutions</h3>
-<h4>Repetetive daily event</h4>
-<li data-start="12:10" data-end="18:00" class="timeit">12:10 PM - 6 PM daily</li>
-<h4>Repetetive event with a start/end date</h4>
-<li data-start="2014-09-01 05:00" data-end="11:00" class="timeit">Show content from 5AM to 12AM daily starting Sept 1, 2014</li>
+    <!-- Docs -->
+    <section id="docs">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>When to use</h2>
+                    <hr class="star-primary">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4 portfolio-item">
+                   <h4>Use TimeIT.js when you... </h4>
+                   <ul>
+                   <li>need to <strong>show/hide content on a simple static web page</strong> before/after a certain date</li>
+                   <li><strong>don't have access to back-end</strong> to make a conditional statement or time your content</li>
+                   <li>using <strong>CMS that does not have functionality</strong> that shows content based on date and time</li>
+                   <li>are <strong>not familiar with programming</strong></li>
+                   <li>want a <strong>simple solution to time your events</strong> and content</li>
+                   </ul>                   
+</div>
+                <div class="col-sm-4 portfolio-item">
+                   <h4>Dependencies and prerequisites</h4>
+                   <ul>
+                   <li>You need access to source code of a page to link a plugin to your site/page.</li>
+                   <li>Plugin is using jQuery, so you need to have it on your website. Otherwise you can link <a href="https://code.jquery.com/" target="_blank">jQuery from CDN</a>.</li>
+                   </ul>
+                </div>
+                
+                <div class="col-sm-4 portfolio-item">
+                   <h4>Troubleshooting</h4>
+                   <ul>
+                   <li>You can also use the <a href="https://github.com/vsevolodts/TimeIT.js/issues" target="_blank">GitHub issue tracker</a> to find related issues or open a new issue.</li>
+                   <li>Or send me a note via your favorite <a href="#contact">social network</a></li>
+                   </ul>
+                </div>
+            </div>
+        </div>
+</section>
+                
+<section id="implement">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12 text-center">
+                    <h2>Implement</h2>
+                    <hr class="star-primary">
+                </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-8 col-lg-offset-2">
+                   <ol>
+                   <li>Upload <code>timeit.js</code> plugin to your site or link from CDN 
+                       <pre><code>&lt;script src="http://res.cloudinary.com/vsevolodts/raw/upload/v1503371762/timeit.min.js"&gt;&lt;/script&gt;</code></pre></li>
+				    <li>Make sure <code>jQuery.js</code> library is loaded on your page:
+                       <pre><code>&lt;script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"&gt;&lt;/script&gt;</code></pre></li>
+                   <li>Add the class <code>.timeit</code> to an element you want to manipulate</li>
+                   <li>Specify date(s) and time when you want to display <code>data-start="2016-01-31"</code> or hide <code>data-end="2019-06-06 14:30</code> content. Acceptable format of time / date:<br>
+                   <code>YYYY-MM-DD HH:MM</code> Exact day and time<br>
+                   <code>YYYY-MM-DD</code> - day only (starts on midnight local user time)<br>
+                   <code>HH:MM</code> - Hours and minutes (for repetetive events)<br>
+See <a href="#examples">examples</a>.</li>
+                   <li>Final example of the code:<br>
+                   
+                  
+<pre>
+<code>&lt;div class="timeit" data-start="2017-12-31" data-end="2018-01-31 23:59"&gt;
+	This content will be shown only in January 2018
+&lt;/div&gt;
+...
+&lt;script src="/js/timeit.js"&gt;&lt;/script&gt;
+</code>
+</pre>
+                   </li>
+                   <li>Optional: define what you want to do with the dates (hide by default) by altering  <code>.hidden</code>css class that are added to expired event.</li>
+                   </ol>                   
+</div>
+
+            </div>
+        </div>
+    </section>
+
+<!-- Examples -->
+    <section id="examples">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>Examples</h2>
+                    <hr class="star-primary">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2">
+               	  <h3>Basic examples</h3>
+                  <h4>Hide content after a date</h4>
+                  <div class="row">
+                  	<div class="col-md-5"><div data-end="2016-05-05" class="timeit">May 5th, 2016 <small>no start, past end = hidden</small></div></div>
+                    <div class="col-md-7"><pre><code>&lt;div data-end="2016-05-05" class="timeit"&gt;May 5th, 2016&lt;/div&gt;</code></pre></div>
+                   </div>
+                    
+                   <div class="row">
+                  	<div class="col-md-5"><div data-end="<?php echo date('Y-m-j', $nextyear); ?>" class="timeit"><small>End on future date of <?php echo date('F jS, Y', $nextyear); ?>, no start date = shown</small></div></div>
+                    <div class="col-md-7"><pre><code>&lt;div data-end="<?php echo date('Y-m-j', $nextyear); ?>" class="timeit"&gt;<?php echo date('F jS, Y', $nextyear); ?>&lt;/div&gt;</code></pre></div>
+                  </div>
+                  
+                  <div class="row">
+                  	<div class="col-md-5"><div data-start="2017-01-10" class="timeit">January 10th, 2017 <small>start in the past, no end = shown</small></div></div>
+                    <div class="col-md-7"><pre><code>&lt;div data-start="2017-01-10" class="timeit"&gt;January 10th, 2017&lt;/div&gt;</code></pre></div>
+                   </div>
+                   
+                   <br>
+
+                  <h4>Show content between dates</h4>
+                  <div class="row">
+                  	<div class="col-md-5">
+                  <li data-start="<?php echo date('Y-m-j', $lastweek); ?>" data-end="<?php echo date('Y-m-j', $nextweek); ?>" class="timeit"> <small>whithing a range = shown</small></li>
+                  </div>
+                  <div class="col-md-7"><pre><code>&lt;div data-start="<?php echo date('F jS, Y', $lastweek); ?>" data-end="<?php echo date('F jS, Y', $nextweek); ?>" class="timeit"&gt;between last and next week&lt;/div&gt;</code></pre>
+                  <small style="top: -10px;position: relative;">* note that the end date is set to the next day after the last day when the content need to be shown</small></div>
+                   </div>
+                  <div class="row">
+                  	<div class="col-md-5"><div data-start="2016-06-30" data-end="2016-07-01" class="timeit">June - July 2013 <small>past range = hidden</small></div></div>
+                    <div class="col-md-7"><pre><code>&lt;div data-start="2016-06-30" data-end="2016-07-01" class="timeit"&gt;June - July 2016&lt;/div&gt;</code></pre></div>
+                    </div>
+                    
+                    <div class="row">
+                  	<div class="col-md-5"><div data-start="2019-01-01" data-end="2019-03-01" class="timeit">Jan-Feb 2019 <small>future range = hidden</small></div></div>
+                    <div class="col-md-7"><pre><code>&lt;div data-start="2019-01-01" data-end="2019-03-01" class="timeit"&gt;Jan-Feb 2019&lt;/div&gt;</code></pre></div>
+                    </div>
+                    
+                    <br>
+                                        
+                  <h4>Show content after a date (no expiration)</h4>
+                  <li data-start="2016-06-31" class="timeit">June 31, 2016 <small>shown - current event</small></li>
+                  <li data-start="2019-06-31" class="timeit">Jan 1st, 2019 <small>hidden - future event</small></li>
+                    <br>
+                    
+                  <h3>Complex solutions</h3>
+                  <h4>Repetetive daily event</h4>
+                  <li data-start="17:10" data-end="18:00" class="timeit" id="#time">5:10 PM - 6 PM daily</li><br>
+
+                  <h4>Repetetive event with a start/end date</h4>
+                  <li data-start="2016-09-01 05:00" data-end="12:00" class="timeit" id="#time">Show content from 12AM to 12PM daily starting Sept 1, 2016</li>
 <br><br>
 
-<h3>Processing user input errors</h3>
-<p>When the date or time is entered with an error, .error class is added with a 'title' attribute that describes an error. This functionality is removed from minified version of the plugin.</p>
-<li data-start="5 AM" data-end="5 PM" class="timeit">5 AM - 10-30 daily</li>
-<li data-start="2014\12\31" class="timeit">2014\12\31</li>
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <!-- Builder -->
+    <section class="success" id="build">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>Builder</h2>
+                    <hr class="star-light">
+                </div>
+            </div>
+<div class="col-lg-8 col-lg-offset-2">
+            <div class="col-sm-6">
+                <div class="table-cell">I want to </div>
+                   <div class="table-cell">
+					<select id="decision" class="form-control">
+						<option value="shown">show</option>
+                        <option value="hidden">hide</option>
+					</select>
+				</div>
+			</div>
+            <div class="col-sm-6">
+				<div class="table-cell">content</div>
+					<div class="table-cell">
+					<select id="timespan" class="form-control">
+	                    <option value="between">between</option>
+						<option value="before">before</option>
+						<option value="after">after</option>
+					</select>
+                </div>
+			</div>
 
-    <br><br>
+<div class="clearfix"></div>
+                 
+			<div class="col-sm-6" id="data-start">
+                 	<div class="table-cell vam">Start date:</div>
+                    <div class="table-cell">
+						<input class="datetimepicker form-control" id="start-date" value="2013-12-31">
+                    </div>
+				</div>
+                 
+				<div class="col-sm-6" id="data-end">
+					<div class="table-cell vam">End date:</div>
+					<div class="table-cell">
+                    	<input class="datetimepicker form-control" id="end-date" value="2020-01-01 00:00">
+                    </div>
+                </div>
+                
+                <div class="clearfix"></div>
+                <div class="col-sm-12 alert alert-danger hidden" id="message"></div>
+                <div class="clearfix"></div>
+                <div class="col-sm-12" id="outcome">
+<pre>
+<code>&lt;div calss="timeit" <span id='code-data-start'>data-start="2013-12-31"</span> <span id='code-data-end'>data-end="2020-01-01 00:00"</span>&gt;
+	This content will be<span id="code-decision"> shown</span><span id="code-timespan"> between</span><span id="code-between"><span id="code-value-data-start"> 2013-12-31</span><span id="code-between-and"> and</span><span id="code-value-data-end"> 2020-01-01 00:00</span></span>
+&lt;/div&gt;
+...
+&lt;script src="/js/timeit.js"&gt;&lt;/script&gt;
+</code>
+</pre>
+                </div>
+            </div>
+        </div>
+    </section>
 
-<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <!-- Footer -->
+    <footer class="text-center" id="contact">
+        <div class="footer-above">
+            <div class="container">
+                <div class="row">
+                  <div class="footer-col col-md-6">
+                    <h3>Keep in touch</h3>
+                        <ul class="list-inline">
+                            <li>
+                                <a href="https://www.facebook.com/vsevolod.tsurikov.5" class="btn-social btn-outline" target="_blank"><i class="fa fa-fw fa-facebook"></i></a>
+                            </li>
+                            <li>
+                                <a href="https://plus.google.com/u/0/109249545004098693243" class="btn-social btn-outline" target="_blank"><i class="fa fa-fw fa-google-plus"></i></a>
+                            </li>
+                            <li>
+                                <a href="https://twitter.com/vsevolodts" class="btn-social btn-outline" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                            </li>
+                            <li>
+                                <a href="http://www.linkedin.com/in/tsurikov" class="btn-social btn-outline" target="_blank"><i class="fa fa-fw fa-linkedin"></i></a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/vsevolodts" class="btn-social btn-outline" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="footer-col col-md-6">
+                        <h3>My projects</h3>
+                        <p>Explore my other projects at <a href="http://www.vsevolodtsurikov.com/">VsevolodTsurikov.com</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-below">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                    Do you need more flexible tool to Parse, validate, manipulate, and display dates in JavaScript? Check <a href="http://momentjs.com/" target="_blank">Moment.js</a>! </div>
+                </div>
+            </div>
+        </div>
+    </footer>    
+<script src="js/jquery.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+<script src="js/classie.js"></script>
+<script src="js/cbpAnimatedHeader.js"></script>
+<script src="js/freelancer.js"></script>
 <script src="timeit.js"></script>
+<script src="js/datetimepicker.js"></script>
+
+<script type="text/javascript">
+$('.datetimepicker').datetimepicker();
+</script>
+
+
+<script>
+$("#timespan, #decision").change( function (){
+	var codetimespan = $("#timespan option:selected").val(),
+		codedecision = $("#decision option:selected").val();
+	var codestartdate = $("#start-date").val(),
+		codeenddate = $("#end-date").val();
+
+	$("#code-decision").text(" "+ codedecision );
+	if ( codetimespan == 'between') {
+		$("#build *").not("#message").removeClass("hidden");		
+		if (codedecision == 'shown') { 
+			$("#data-start").removeClass("pull-right");
+		} else {
+			$("#data-start").addClass("pull-right");
+		};
+	};
+	
+	if ( (codetimespan == 'before' && codedecision == 'hidden') || (codetimespan == 'after' && codedecision == 'shown') ) {
+		$("[id$='data-end'], #code-between-and").addClass("hidden");
+		$("[id$='data-start']").removeClass("hidden");
+		
+	};
+	if ( (codetimespan == 'before' && codedecision == 'shown') || (codetimespan == 'after' && codedecision == 'hidden' ) ){
+		$("[id$='data-start'], #code-between-and").addClass("hidden");
+		$("[id$='data-end']").removeClass("hidden");
+	};
+	
+	$("#code-timespan").text(" "+codetimespan );
+});
+
+$("#start-date").change( function (){;
+	var codestartdate = $("#start-date").val(),
+		codeenddate = $("#end-date").val();
+	var codetimespan = $("#timespan option:selected").val(),
+		codedecision = $("#decision option:selected").val();
+		
+	if ( codetimespan == 'between' && codedecision == 'shown' && codestartdate > codeenddate) {
+		$("#message").removeClass("hidden").text("Alert: Start date must be earlier than the End date");
+	} else if ( codetimespan == 'between' && codedecision == 'hidden' && codestartdate < codeenddate) {
+		$("#message").removeClass("hidden").text("Alert: End date must be earlier than the Start date");
+	} else {
+		$("#message").addClass("hidden")
+	};
+		
+	$("#code-value-data-start").text(" "+codestartdate);
+	$("#code-data-start").text('data-start="'+codestartdate+'"');
+
+});
+$("#end-date").change( function (){;
+	var codestartdate = $("#start-date").val(),
+		codeenddate = $("#end-date").val();
+	var codetimespan = $("#timespan option:selected").val(),
+		codedecision = $("#decision option:selected").val();
+
+	if ( codetimespan == 'between' && codedecision == 'shown' && codestartdate > codeenddate) {
+		$("#message").removeClass("hidden").text("Alert: Start date must be earlier than the End date");
+	} else if ( codetimespan == 'between' && codedecision == 'hidden' && codestartdate < codeenddate) {
+		$("#message").removeClass("hidden").text("Alert: End date must be earlier than the Start date");
+	} else {
+		$("#message").addClass("hidden")
+	};
+		
+	$("#code-value-data-end").text(" "+codeenddate);
+	$("#code-data-end").text('data-end="'+codeenddate+'"');
+
+});
+
+
+</script>
 </body>
 </html>
