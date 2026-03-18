@@ -1,109 +1,122 @@
-//version 3. 2017-08-13
-function timeit() {
-  var next_run_array = []; //array of dates/time on a page used to rerun function if a change should happen during the session
-  var curDate = new Date();
-  Date.prototype.yyyymmdd = function() {
-    var mm = this.getMonth() + 1;
-    var dd = this.getDate();
-    return [this.getFullYear(),
-      (mm > 9 ? '' : '0') + mm,
-      (dd > 9 ? '' : '0') + dd
-    ].join('-');
+﻿// timeit v5 (modernized)
+(() => {
+  const SELECTOR = '.timeit';
+  const MIN_DELAY = 1000;
+  const MAX_DELAY = 1000 * 60 * 60 * 24;
+
+  const now = () => Date.now();
+
+  const parseDate = (input) => {
+    if (!input) return null;
+
+    const trimmed = input.trim();
+
+    // If only time provided → assume today
+    if (/^\d{1,2}:\d{2}$/.test(trimmed)) {
+      const today = new Date();
+      const [h, m] = trimmed.split(':').map(Number);
+      today.setHours(h, m, 0, 0);
+      return today.getTime();
+    }
+
+    // If only date → assume midnight
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+      return new Date(`${trimmed}T00:00`).getTime();
+    }
+
+    // Full datetime
+    const parsed = new Date(trimmed.replace(' ', 'T'));
+    return Number.isNaN(parsed.getTime()) ? null : parsed.getTime();
   };
-  var curDateYMD = curDate.yyyymmdd();
 
-  $('.timeit').each(function() {
-    var end = $(this).data('end'),
-      start = $(this).data('start');
-    //check if date or time value has valid format and push it to the list of refresh anchors
-    var startDate = checkdate(start, this);
-    var endDate = checkdate(end, this);
-    nextrun(startDate);
-    nextrun(endDate);
-    
-	//add a datetime when the page needs to be refreshed (now+24 hrs time span only)
-    function nextrun(date) {
-      var nextruntimeout = date - curDate;
-      if (nextruntimeout < 1000 * 60 * 60 * 24 && nextruntimeout > 1000) {
-        next_run_array.push(nextruntimeout);    
-      }
-    }
-    
-    // Main Function 
-    //check if the evend outside of a desired time span
-    if (((startDate < endDate) && (startDate > curDate || endDate < curDate)) ||
-      ((startDate > endDate) && (startDate >= curDate) && (endDate <= curDate))
-    ) {
-      $(this).addClass('hidden');
-    } else {
-      $(this).removeClass('hidden');
+  const isValidTime = (timestamp) =>
+    typeof timestamp === 'number' && !Number.isNaN(timestamp);
+
+  const shouldHide = (start, end, current) => {
+    if (!start && !end) return false;
+
+    // Normal range
+    if (start && end && start <= end) {
+      return current < start || current > end;
     }
 
-	//Support Functions
-    //correct data creation from a string. accepted format YYYY-MM-DD HH:MM
-    function parseISO8601(d) {
-    var isoExp = /^\s*(\d{4})-(\d\d)-(\d\d)?.(\d\d)?.(\d\d)\s*$/,
-        date = new Date(NaN), 
-        datenew,
-        month,
-        dateString=d.substr(0, d.indexOf(' ')); 
-        parts = isoExp.exec(d);
-
-    if(parts) {  
-      month = +parts[2];
-      date.setFullYear(parts[1], month - 1, parts[3]);
-      if(month != date.getMonth() + 1) {
-        date.setTime(NaN);
-      }
-      date = new Date(parts[1], month - 1, parts[3],  parts[4], parts[5])
+    // Overnight range (e.g., 22:00 → 06:00)
+    if (start && end && start > end) {
+      return current > end && current < start;
     }
-    return date;
+
+    // Only start
+    if (start && !end) {
+      return current < start;
+    }
+
+    // Only end
+    if (!start && end) {
+      return current > end;
+    }
+
+    return false;
+  };
+
+  const updateElement = (el, currentTime) => {
+    const startRaw = el.dataset.start;
+    const endRaw = el.dataset.end;
+
+    const start = parseDate(startRaw);
+    const end = parseDate(endRaw);
+
+    const valid = (!startRaw || isValidTime(start)) &&
+                  (!endRaw || isValidTime(end));
+
+    if (!valid) {
+      el.classList.add('error');
+      el.title = 'Invalid date format. Use YYYY-MM-DD HH:MM';
+      return null;
+    }
+
+    const hidden = shouldHide(start, end, currentTime);
+
+    el.classList.toggle('hidden', hidden);
+    el.setAttribute('aria-hidden', hidden);
+
+    return [start, end];
+  };
+
+  const scheduleNextRun = (times) => {
+    const current = now();
+
+    const futureDiffs = times
+      .flat()
+      .filter(Boolean)
+      .map((t) => t - current)
+      .filter((diff) => diff > MIN_DELAY && diff < MAX_DELAY);
+
+    if (!futureDiffs.length) return;
+
+    const next = Math.min(...futureDiffs);
+
+    console.log(`timeit → next run in ${Math.round(next / 1000)}s`);
+    setTimeout(run, next);
+  };
+
+  const run = () => {
+    const elements = document.querySelectorAll(SELECTOR);
+    const current = now();
+
+    const allTimes = [];
+
+    elements.forEach((el) => {
+      const times = updateElement(el, current);
+      if (times) allTimes.push(times);
+    });
+
+    scheduleNextRun(allTimes);
+  };
+
+  // Init
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    run();
   }
-
-  //unification of the date string to the format YYYY-MM-DD HH:MM
-    function checkdate(date, obj) {
-      if (date) {
-        //check if only time is set (HH:MM); if so, add today's date 
-        if (String(date).length < 6 && String(date).indexOf(":") > -1) {
-          date = curDateYMD + ' ' + String(date);
-        }
-        //check if only date is set; if so add 00:00 to the end of date
-        if (String(date).indexOf(":") == -1) {
-          date = date + ' 00:00';
-        }
-        //check if date is valid (avoid valid time)
-        var res = date.split(":"),
-          h = String(res.slice(0, 1)),
-          hours = h.substr(h.length - 2),
-          minutes = res.slice(1);
-        var timetest = (hours < 24 && minutes < 60) ? true : false;
-
-        //check if date is could be created from a value; if fails try to parse a string to a format
-        var returndate = new Date(date);
-        if (returndate == 'Invalid Date') {
-          var returndate = parseISO8601(date);
-        };
-        
-        
-        if (returndate == 'Invalid Date' || !timetest) {
-          //highlight the element if the is an error. use own \.error class if needed
-          $(obj).addClass("error").attr('title', '"' + date + '" date is incorrect; please use YYYY-MM-DD HH:MM format');
-        }
-        return returndate.getTime();
-      } else {
-        //if datetime is not set, just return current date-time
-        return curDate.getTime();
-      }
-    }
-  });
-
-  /* Schedule next runs */
-  if (next_run_array.length > 0) {  
-    var nextruntime = Math.min.apply(null, next_run_array);
-    console.log("next run of timeit function is in " +  nextruntime / 1000 + "seconds");
-    setTimeout(function() {
-      timeit();
-    }, nextruntime);
-  }
-}
-timeit();
+})();
