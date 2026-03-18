@@ -12,13 +12,13 @@ $nextyear  = mktime(0, 0, 0, date("m")  , date("d"), date("Y")+1);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Simple javascript plugin that help to orginize content that should be shown only during certain time on a static page.">
     <meta name="author" content="Vsevolod Tsurikov">
-    <title>TimeIT.js - jQuery plugin to Show/Hide Content at Set Date/Time</title>    
+    <title>TimeIT.js - Vanilla JS plugin to Show/Hide Content at Set Date/Time</title>    
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/freelancer.css" rel="stylesheet">
     <link href="css/datetimepicker.css" rel="stylesheet">
     <link href="font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
-    <link href="http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
     <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
@@ -77,11 +77,9 @@ $nextyear  = mktime(0, 0, 0, date("m")  , date("d"), date("Y")+1);
                     <div class="intro-text">
                         <span class="name"> <i class="fa fa-6 fa-calendar"></i> TimeIT.js</span>
                         <hr class="star-light">
-                        <span class="skills">jQuery plugin to Show/Hide Content at Set Date/Time</span>
+                        <span class="skills">Vanilla JS plugin to Show/Hide Content at Set Date/Time</span>
                     </div>
                     <div class="col-lg-8 col-lg-offset-2 text-center">
-                    <a href="timeit.zip" class="btn btn-lg btn-outline"><i class="fa fa-download"></i> Download Plugin</a>
-                    <br>
                     <a href="https://github.com/vsevolodts/TimeIT.js" target="_blank" class="btn btn-md btn-outline"><i class="fa fa-github"></i> Fork on Github</a>
                     <a href="http://codepen.io/VsevolodTS/pen/KFEou" target="_blank" class="btn btn-md btn-outline"><i class="fa fa-codepen"></i> Fork on CodePen</a>
                 </div>
@@ -114,7 +112,7 @@ $nextyear  = mktime(0, 0, 0, date("m")  , date("d"), date("Y")+1);
                    <h4>Dependencies and prerequisites</h4>
                    <ul>
                    <li>You need access to source code of a page to link a plugin to your site/page.</li>
-                   <li>Plugin is using jQuery, so you need to have it on your website. Otherwise you can link <a href="https://code.jquery.com/" target="_blank">jQuery from CDN</a>.</li>
+                   <li>Plugin is now pure JavaScript and does not require jQuery.</li>
                    </ul>
                 </div>
                 
@@ -142,8 +140,8 @@ $nextyear  = mktime(0, 0, 0, date("m")  , date("d"), date("Y")+1);
                    <ol>
                    <li>Upload <code>timeit.js</code> plugin to your site or link from CDN 
                        <pre><code>&lt;script src="http://res.cloudinary.com/vsevolodts/raw/upload/v1503371762/timeit.min.js"&gt;&lt;/script&gt;</code></pre></li>
-				    <li>Make sure <code>jQuery.js</code> library is loaded on your page:
-                       <pre><code>&lt;script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"&gt;&lt;/script&gt;</code></pre></li>
+				    <li>Load only <code>timeit.js</code> (no jQuery required):
+                       <pre><code>&lt;script src="/js/timeit.js"&gt;&lt;/script&gt;</code></pre></li>
                    <li>Add the class <code>.timeit</code> to an element you want to manipulate</li>
                    <li>Specify date(s) and time when you want to display <code>data-start="2016-01-31"</code> or hide <code>data-end="2019-06-06 14:30</code> content. Acceptable format of time / date:<br>
                    <code>YYYY-MM-DD HH:MM</code> Exact day and time<br>
@@ -341,89 +339,84 @@ See <a href="#examples">examples</a>.</li>
                 </div>
             </div>
         </div>
-    </footer>    
-<script src="js/jquery.js"></script>
+    </footer>
 <script src="js/bootstrap.min.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
 <script src="js/classie.js"></script>
 <script src="js/cbpAnimatedHeader.js"></script>
 <script src="js/freelancer.js"></script>
 <script src="timeit.js"></script>
-<script src="js/datetimepicker.js"></script>
-
-<script type="text/javascript">
-$('.datetimepicker').datetimepicker();
-</script>
-
 
 <script>
-$("#timespan, #decision").change( function (){
-	var codetimespan = $("#timespan option:selected").val(),
-		codedecision = $("#decision option:selected").val();
-	var codestartdate = $("#start-date").val(),
-		codeenddate = $("#end-date").val();
+function setText(selector, text) {
+  var el = document.querySelector(selector);
+  if (el) el.textContent = text;
+}
+function hideAll(selector) {
+  document.querySelectorAll(selector).forEach(function (el) {
+    el.classList.add('hidden');
+  });
+}
+function showAll(selector) {
+  document.querySelectorAll(selector).forEach(function (el) {
+    el.classList.remove('hidden');
+  });
+}
+function updateBuilder() {
+  var codetimespan = document.getElementById('timespan').value;
+  var codedecision = document.getElementById('decision').value;
+  var codestartdate = document.getElementById('start-date').value;
+  var codeenddate = document.getElementById('end-date').value;
 
-	$("#code-decision").text(" "+ codedecision );
-	if ( codetimespan == 'between') {
-		$("#build *").not("#message").removeClass("hidden");		
-		if (codedecision == 'shown') { 
-			$("#data-start").removeClass("pull-right");
-		} else {
-			$("#data-start").addClass("pull-right");
-		};
-	};
-	
-	if ( (codetimespan == 'before' && codedecision == 'hidden') || (codetimespan == 'after' && codedecision == 'shown') ) {
-		$("[id$='data-end'], #code-between-and").addClass("hidden");
-		$("[id$='data-start']").removeClass("hidden");
-		
-	};
-	if ( (codetimespan == 'before' && codedecision == 'shown') || (codetimespan == 'after' && codedecision == 'hidden' ) ){
-		$("[id$='data-start'], #code-between-and").addClass("hidden");
-		$("[id$='data-end']").removeClass("hidden");
-	};
-	
-	$("#code-timespan").text(" "+codetimespan );
+  setText('#code-decision', ' ' + codedecision);
+  setText('#code-timespan', ' ' + codetimespan);
+  setText('#code-value-data-start', ' ' + codestartdate);
+  setText('#code-value-data-end', ' ' + codeenddate);
+  setText('#code-data-start', 'data-start="' + codestartdate + '"');
+  setText('#code-data-end', 'data-end="' + codeenddate + '"');
+
+  document.querySelectorAll('#build *').forEach(function (el) {
+    if (el.id !== 'message') el.classList.remove('hidden');
+  });
+
+  if (codetimespan === 'between') {
+    document.getElementById('data-start').classList.toggle('pull-right', codedecision !== 'shown');
+  }
+
+  if ((codetimespan === 'before' && codedecision === 'hidden') || (codetimespan === 'after' && codedecision === 'shown')) {
+    hideAll("[id$='data-end'], #code-between-and");
+    showAll("[id$='data-start']");
+  }
+  if ((codetimespan === 'before' && codedecision === 'shown') || (codetimespan === 'after' && codedecision === 'hidden')) {
+    hideAll("[id$='data-start'], #code-between-and");
+    showAll("[id$='data-end']");
+  }
+
+  var messageEl = document.getElementById('message');
+  if (codetimespan === 'between' && codedecision === 'shown' && codestartdate > codeenddate) {
+    messageEl.classList.remove('hidden');
+    messageEl.textContent = 'Alert: Start date must be earlier than the End date';
+  } else if (codetimespan === 'between' && codedecision === 'hidden' && codestartdate < codeenddate) {
+    messageEl.classList.remove('hidden');
+    messageEl.textContent = 'Alert: End date must be earlier than the Start date';
+  } else {
+    messageEl.classList.add('hidden');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  var timespan = document.getElementById('timespan');
+  var decision = document.getElementById('decision');
+  var startDate = document.getElementById('start-date');
+  var endDate = document.getElementById('end-date');
+
+  if (timespan && decision && startDate && endDate) {
+    timespan.addEventListener('change', updateBuilder);
+    decision.addEventListener('change', updateBuilder);
+    startDate.addEventListener('change', updateBuilder);
+    endDate.addEventListener('change', updateBuilder);
+    updateBuilder();
+  }
 });
-
-$("#start-date").change( function (){;
-	var codestartdate = $("#start-date").val(),
-		codeenddate = $("#end-date").val();
-	var codetimespan = $("#timespan option:selected").val(),
-		codedecision = $("#decision option:selected").val();
-		
-	if ( codetimespan == 'between' && codedecision == 'shown' && codestartdate > codeenddate) {
-		$("#message").removeClass("hidden").text("Alert: Start date must be earlier than the End date");
-	} else if ( codetimespan == 'between' && codedecision == 'hidden' && codestartdate < codeenddate) {
-		$("#message").removeClass("hidden").text("Alert: End date must be earlier than the Start date");
-	} else {
-		$("#message").addClass("hidden")
-	};
-		
-	$("#code-value-data-start").text(" "+codestartdate);
-	$("#code-data-start").text('data-start="'+codestartdate+'"');
-
-});
-$("#end-date").change( function (){;
-	var codestartdate = $("#start-date").val(),
-		codeenddate = $("#end-date").val();
-	var codetimespan = $("#timespan option:selected").val(),
-		codedecision = $("#decision option:selected").val();
-
-	if ( codetimespan == 'between' && codedecision == 'shown' && codestartdate > codeenddate) {
-		$("#message").removeClass("hidden").text("Alert: Start date must be earlier than the End date");
-	} else if ( codetimespan == 'between' && codedecision == 'hidden' && codestartdate < codeenddate) {
-		$("#message").removeClass("hidden").text("Alert: End date must be earlier than the Start date");
-	} else {
-		$("#message").addClass("hidden")
-	};
-		
-	$("#code-value-data-end").text(" "+codeenddate);
-	$("#code-data-end").text('data-end="'+codeenddate+'"');
-
-});
-
-
 </script>
 </body>
 </html>
